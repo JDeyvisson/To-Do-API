@@ -1,26 +1,41 @@
 package com.todoapi.todoapi.models;
 
-public class Tarefa {
-    
-    private String descricao;
-    private boolean feito = false;
+import com.todoapi.todoapi.state.PendenteState;
+import com.todoapi.todoapi.state.TarefaState;
 
-    public Tarefa(String descricao){
+public class Tarefa {
+
+    private static int contadorId = 1;
+
+    private int id;
+    private String descricao;
+    private TarefaState estado;
+
+    public Tarefa(String descricao) {
+        this.id = contadorId++;
         this.descricao = descricao;
+        this.estado = new PendenteState(); 
     }
-    public String getDescrição() {
+
+   
+    public void avancarEstado() {
+        this.estado = this.estado.avancar();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getDescricao() {
         return descricao;
     }
-    public void setDescrição(String descrição) {
-        this.descricao = descrição;
-    }
-    public boolean isFeito() {
-        return feito;
-    }
-    public void setFeito(boolean feito) {
-        this.feito = feito;
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
-    
+    public String getEstado() {
+        return estado.getNome();
+    }
 
 }

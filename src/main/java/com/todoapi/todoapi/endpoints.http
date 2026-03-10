@@ -1,1 +1,45 @@
-GET http://localhost:8080/tarefas
+### Base URL
+@baseUrl = http://localhost:8080/tarefas
+
+### Listar todas as tarefas
+GET {{baseUrl}}
+
+###
+
+###  Criar tarefa 1
+POST {{baseUrl}}/criar?descricao=Estudar Design Patterns
+
+###
+
+###  Criar tarefa 2
+POST {{baseUrl}}/criar?descricao=Fazer o desafio da DIO
+
+###
+
+###  Criar tarefa 3
+POST {{baseUrl}}/criar?descricao=Revisar Spring Boot
+
+###
+
+###  Avançar estado da tarefa (PENDENTE → EM_PROGRESSO)
+PATCH {{baseUrl}}/1/avancar
+
+###
+
+###  Avançar estado da tarefa novamente (EM_PROGRESSO → CONCLUIDA)
+PATCH {{baseUrl}}/1/avancar
+
+###
+
+###  Tentar avançar tarefa já CONCLUIDA (fica em CONCLUIDA)
+PATCH {{baseUrl}}/1/avancar
+
+###
+
+###  Atualizar descrição da tarefa
+PUT {{baseUrl}}/2/atualizar?descricao=Fazer o desafio da DIO e subir no GitHub
+
+###
+
+###  Deletar tarefa
+DELETE {{baseUrl}}/3/deletar
