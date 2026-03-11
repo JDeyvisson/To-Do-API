@@ -32,7 +32,6 @@ public class UsuarioService {
                 .toList();
     }
 
-    // retorna a entidade — usado internamente pelos outros services
     public Usuario buscarEntidadePorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado com id: " + id));
@@ -50,7 +49,7 @@ public class UsuarioService {
     }
 
     public void deletarUsuario(Long id) {
-        buscarEntidadePorId(id); // valida se existe antes de deletar
+        buscarEntidadePorId(id); 
         usuarioRepository.deleteById(id);
     }
 
