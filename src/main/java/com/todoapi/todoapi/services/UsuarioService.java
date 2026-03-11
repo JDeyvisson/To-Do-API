@@ -1,51 +1,57 @@
 package com.todoapi.todoapi.services;
 
-import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.todoapi.todoapi.dtos.UsuarioRequestDTO;
+import com.todoapi.todoapi.dtos.UsuarioResponseDTO;
+import com.todoapi.todoapi.mappers.UsuarioMapper;
 import com.todoapi.todoapi.models.Usuario;
+import com.todoapi.todoapi.repositories.UsuarioRepository;
 
 @Service
 public class UsuarioService {
 
-    private ArrayList<Usuario> usuarios = new ArrayList<>();
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-    public Usuario criarUsuario(String nome, String email) {
-       
-        boolean emailJaExiste = usuarios.stream()
-                .anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
-
-        if (emailJaExiste) {
-            throw new RuntimeException("Já existe um usuário com o e-mail: " + email);
+    public UsuarioResponseDTO criarUsuario(UsuarioRequestDTO dto) {
+        if (usuarioRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Já existe um usuário com o e-mail: " + dto.getEmail());
         }
-
-        Usuario usuario = new Usuario(nome, email);
-        usuarios.add(usuario);
-        return usuario;
+        Usuario salvo = usuarioRepository.save(new Usuario(dto.getNome(), dto.getEmail()));
+        return UsuarioMapper.toDTO(salvo);
     }
 
-    public ArrayList<Usuario> listarUsuarios() {
-        return usuarios;
+    public List<UsuarioResponseDTO> listarUsuarios() {
+        return usuarioRepository.findAll()
+                .stream()
+                .map(UsuarioMapper::toDTO)
+                .toList();
     }
 
-    public Usuario buscarPorId(int id) {
-        return usuarios.stream()
-                .filter(u -> u.getId() == id)
-                .findFirst()
+    // retorna a entidade — usado internamente pelos outros services
+    public Usuario buscarEntidadePorId(Long id) {
+        return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado com id: " + id));
     }
 
-    public Usuario atualizarUsuario(int id, String nome, String email) {
-        Usuario usuario = buscarPorId(id);
-        if (nome != null && !nome.isBlank()) usuario.setNome(nome);
-        if (email != null && !email.isBlank()) usuario.setEmail(email);
-        return usuario;
+    public UsuarioResponseDTO buscarPorId(Long id) {
+        return UsuarioMapper.toDTO(buscarEntidadePorId(id));
     }
 
-    public void deletarUsuario(int id) {
-        Usuario usuario = buscarPorId(id);
-        usuarios.remove(usuario);
+    public UsuarioResponseDTO atualizarUsuario(Long id, UsuarioRequestDTO dto) {
+        Usuario usuario = buscarEntidadePorId(id);
+        if (dto.getNome() != null && !dto.getNome().isBlank()) usuario.setNome(dto.getNome());
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) usuario.setEmail(dto.getEmail());
+        return UsuarioMapper.toDTO(usuarioRepository.save(usuario));
+    }
+
+    public void deletarUsuario(Long id) {
+        buscarEntidadePorId(id); // valida se existe antes de deletar
+        usuarioRepository.deleteById(id);
     }
 
 }

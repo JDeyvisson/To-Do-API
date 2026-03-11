@@ -1,64 +1,59 @@
 package com.todoapi.todoapi.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.todoapi.todoapi.dtos.TarefaRequestDTO;
+import com.todoapi.todoapi.dtos.TarefaResponseDTO;
+import com.todoapi.todoapi.mappers.TarefaMapper;
 import com.todoapi.todoapi.models.Tarefa;
 import com.todoapi.todoapi.models.Usuario;
+import com.todoapi.todoapi.repositories.TarefaRepository;
 
 @Service
 public class TarefaService {
 
-    private ArrayList<Tarefa> tarefas = new ArrayList<>();
+    @Autowired
+    private TarefaRepository tarefaRepository;
 
     @Autowired
     private UsuarioService usuarioService;
 
-    public Tarefa criarTarefa(int usuarioId, String descricao) {
-        Usuario usuario = usuarioService.buscarPorId(usuarioId);
-
-        Tarefa tarefa = new Tarefa(descricao, usuarioId);
-        tarefas.add(tarefa);
-        usuario.adicionarTarefa(tarefa);
-        return tarefa;
+    public TarefaResponseDTO criarTarefa(Long usuarioId, TarefaRequestDTO dto) {
+        Usuario usuario = usuarioService.buscarEntidadePorId(usuarioId);
+        Tarefa tarefa = tarefaRepository.save(new Tarefa(dto.getDescricao(), usuario));
+        return TarefaMapper.toDTO(tarefa);
     }
 
-    public void deletarTarefa(int usuarioId, int tarefaId) {
-        Usuario usuario = usuarioService.buscarPorId(usuarioId);
-        Tarefa tarefa = buscarTarefaDoUsuario(usuarioId, tarefaId);
-
-        tarefas.removeIf(t -> t.getId() == tarefaId);
-        usuario.removerTarefa(tarefa);
-    }
-
-    public Tarefa avancarEstado(int usuarioId, int tarefaId) {
-        Tarefa tarefa = buscarTarefaDoUsuario(usuarioId, tarefaId);
-        tarefa.avancarEstado();
-        return tarefa;
-    }
-
-    public List<Tarefa> listarTarefasDoUsuario(int usuarioId) {
-
-        usuarioService.buscarPorId(usuarioId);
-        return tarefas.stream()
-                .filter(t -> t.getUsuarioId() == usuarioId)
+    public List<TarefaResponseDTO> listarTarefasDoUsuario(Long usuarioId) {
+        usuarioService.buscarEntidadePorId(usuarioId);
+        return tarefaRepository.findByUsuarioId(usuarioId)
+                .stream()
+                .map(TarefaMapper::toDTO)
                 .toList();
     }
 
-    public Tarefa atualizarTarefa(int usuarioId, int tarefaId, String descricao) {
+    public TarefaResponseDTO avancarEstado(Long usuarioId, Long tarefaId) {
         Tarefa tarefa = buscarTarefaDoUsuario(usuarioId, tarefaId);
-        tarefa.setDescricao(descricao);
-        return tarefa;
+        tarefa.avancarEstado();
+        return TarefaMapper.toDTO(tarefaRepository.save(tarefa));
     }
 
+    public TarefaResponseDTO atualizarTarefa(Long usuarioId, Long tarefaId, TarefaRequestDTO dto) {
+        Tarefa tarefa = buscarTarefaDoUsuario(usuarioId, tarefaId);
+        tarefa.setDescricao(dto.getDescricao());
+        return TarefaMapper.toDTO(tarefaRepository.save(tarefa));
+    }
 
-    private Tarefa buscarTarefaDoUsuario(int usuarioId, int tarefaId) {
-        return tarefas.stream()
-                .filter(t -> t.getId() == tarefaId && t.getUsuarioId() == usuarioId)
-                .findFirst()
+    public void deletarTarefa(Long usuarioId, Long tarefaId) {
+        Tarefa tarefa = buscarTarefaDoUsuario(usuarioId, tarefaId);
+        tarefaRepository.delete(tarefa);
+    }
+
+    private Tarefa buscarTarefaDoUsuario(Long usuarioId, Long tarefaId) {
+        return tarefaRepository.findByIdAndUsuarioId(tarefaId, usuarioId)
                 .orElseThrow(() -> new RuntimeException(
                         "Tarefa " + tarefaId + " não encontrada para o usuário " + usuarioId));
     }

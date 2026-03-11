@@ -11,18 +11,40 @@ GET {{usuarios}}
 
 ###
 
+### Buscar usuário por ID
+GET {{usuarios}}/1
+
+###
+
 ### Criar usuário 1
-POST {{usuarios}}/criar?nome=Deyvisson&email=deyvisson@email.com
+POST {{usuarios}}/criar
+Content-Type: application/json
+
+{
+  "nome": "Deyvisson",
+  "email": "deyvisson@email.com"
+}
 
 ###
 
 ### Criar usuário 2
-POST {{usuarios}}/criar?nome=Maria&email=maria@email.com
+POST {{usuarios}}/criar
+Content-Type: application/json
+
+{
+  "nome": "Maria",
+  "email": "maria@email.com"
+}
 
 ###
 
 ### Atualizar usuário
-PUT {{usuarios}}/1/atualizar?nome=Deyvisson Silva
+PUT {{usuarios}}/1/atualizar
+Content-Type: application/json
+
+{
+  "nome": "Deyvisson Silva"
+}
 
 ###
 
@@ -30,7 +52,7 @@ PUT {{usuarios}}/1/atualizar?nome=Deyvisson Silva
 DELETE {{usuarios}}/2/deletar
 
 # ─────────────────────────────────────────
-# ✅ TAREFAS (vinculadas ao usuário)
+# ✅ TAREFAS
 # ─────────────────────────────────────────
 
 ### Listar tarefas do usuário 1
@@ -39,34 +61,44 @@ GET {{usuarios}}/1/tarefas
 ###
 
 ### Criar tarefa para o usuário 1
-POST {{usuarios}}/1/tarefas/criar?descricao=Estudar Design Patterns
+POST {{usuarios}}/1/tarefas/criar
+Content-Type: application/json
+
+{
+  "descricao": "Estudar Design Patterns"
+}
 
 ###
 
 ### Criar outra tarefa para o usuário 1
-POST {{usuarios}}/1/tarefas/criar?descricao=Fazer o desafio da DIO
+POST {{usuarios}}/1/tarefas/criar
+Content-Type: application/json
+
+{
+  "descricao": "Fazer o desafio da DIO"
+}
 
 ###
 
-### Criar tarefa para o usuário 2
-POST {{usuarios}}/2/tarefas/criar?descricao=Revisar Spring Boot
-
-###
-
-### 🔄 Avançar estado da tarefa 1 do usuário 1 (PENDENTE → EM_PROGRESSO)
+### 🔄 Avançar estado da tarefa 1 (PENDENTE → EM_PROGRESSO)
 PATCH {{usuarios}}/1/tarefas/1/avancar
 
 ###
 
-### 🔄 Avançar estado da tarefa 1 do usuário 1 (EM_PROGRESSO → CONCLUIDA)
+### 🔄 Avançar estado da tarefa 1 (EM_PROGRESSO → CONCLUIDA)
 PATCH {{usuarios}}/1/tarefas/1/avancar
 
 ###
 
-### ✏️ Atualizar descrição da tarefa 2 do usuário 1
-PUT {{usuarios}}/1/tarefas/2/atualizar?descricao=Fazer o desafio e subir no GitHub
+### ✏️ Atualizar descrição da tarefa 2
+PUT {{usuarios}}/1/tarefas/2/atualizar
+Content-Type: application/json
+
+{
+  "descricao": "Fazer o desafio e subir no GitHub"
+}
 
 ###
 
-### 🗑️ Deletar tarefa 2 do usuário 1
+### 🗑️ Deletar tarefa 2
 DELETE {{usuarios}}/1/tarefas/2/deletar

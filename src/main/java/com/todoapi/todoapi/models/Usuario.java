@@ -3,23 +3,43 @@ package com.todoapi.todoapi.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "usuarios")
 public class Usuario {
 
-    private static int contadorId = 1;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private int id;
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false, unique = true)
     private String email;
-    private List<Tarefa> tarefas;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference 
+    private List<Tarefa> tarefas = new ArrayList<>();
+
+    public Usuario() {}
 
     public Usuario(String nome, String email) {
-        this.id = contadorId++;
         this.nome = nome;
         this.email = email;
-        this.tarefas = new ArrayList<>();
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -41,14 +61,6 @@ public class Usuario {
 
     public List<Tarefa> getTarefas() {
         return tarefas;
-    }
-
-    public void adicionarTarefa(Tarefa tarefa) {
-        this.tarefas.add(tarefa);
-    }
-
-    public void removerTarefa(Tarefa tarefa) {
-        this.tarefas.remove(tarefa);
     }
 
 }

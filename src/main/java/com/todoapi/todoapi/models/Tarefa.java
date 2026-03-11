@@ -1,29 +1,70 @@
 package com.todoapi.todoapi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.todoapi.todoapi.state.ConcluidaState;
+import com.todoapi.todoapi.state.EmProgressoState;
 import com.todoapi.todoapi.state.PendenteState;
 import com.todoapi.todoapi.state.TarefaState;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
+@Entity
+@Table(name = "tarefas")
 public class Tarefa {
 
-    private static int contadorId = 1;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private int id;
+    @Column(nullable = false)
     private String descricao;
-    private TarefaState estado;
-    private int usuarioId; 
 
-    public Tarefa(String descricao, int usuarioId) {
-        this.id = contadorId++;
+    @Column(nullable = false)
+    private String estado = "PENDENTE";
+
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonBackReference 
+    private Usuario usuario;
+
+    @Transient
+    private TarefaState estadoObj;
+
+    public Tarefa() {}
+
+    public Tarefa(String descricao, Usuario usuario) {
         this.descricao = descricao;
-        this.estado = new PendenteState(); 
-        this.usuarioId = usuarioId;
+        this.usuario = usuario;
+        this.estado = "PENDENTE";
     }
 
     public void avancarEstado() {
-        this.estado = this.estado.avancar();
+        TarefaState estadoAtual = getEstadoObj();
+        this.estadoObj = estadoAtual.avancar();
+        this.estado = this.estadoObj.getNome();
     }
 
-    public int getId() {
+    private TarefaState getEstadoObj() {
+        if (estadoObj == null) {
+            estadoObj = switch (this.estado) {
+                case "EM_PROGRESSO" -> new EmProgressoState();
+                case "CONCLUIDA"    -> new ConcluidaState();
+                default             -> new PendenteState();
+            };
+        }
+        return estadoObj;
+    }
+
+    public Long getId() {
         return id;
     }
 
@@ -36,11 +77,11 @@ public class Tarefa {
     }
 
     public String getEstado() {
-        return estado.getNome();
+        return estado;
     }
 
-    public int getUsuarioId() {
-        return usuarioId;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
 }
