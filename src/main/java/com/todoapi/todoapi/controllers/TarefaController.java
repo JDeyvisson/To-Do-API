@@ -1,6 +1,6 @@
 package com.todoapi.todoapi.controllers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,35 +17,38 @@ import com.todoapi.todoapi.models.Tarefa;
 import com.todoapi.todoapi.services.TarefaService;
 
 @RestController
-@RequestMapping("/tarefas") 
+@RequestMapping("/usuarios/{usuarioId}/tarefas")
 public class TarefaController {
 
     @Autowired
     private TarefaService tarefaService;
 
     @GetMapping
-    public ArrayList<Tarefa> listarTarefas() {
-        return tarefaService.verTarefas();
+    public List<Tarefa> listarTarefas(@PathVariable int usuarioId) {
+        return tarefaService.listarTarefasDoUsuario(usuarioId);
     }
 
     @PostMapping("/criar")
-    public Tarefa criarTarefa(@RequestParam String descricao) {
-        return tarefaService.criarTarefa(descricao);
+    public Tarefa criarTarefa(@PathVariable int usuarioId, @RequestParam String descricao) {
+        return tarefaService.criarTarefa(usuarioId, descricao);
     }
 
-    @PatchMapping("/{id}/avancar")
-    public Tarefa avancarEstado(@PathVariable int id) {
-        return tarefaService.avancarEstado(id);
+    @PatchMapping("/{tarefaId}/avancar")
+    public Tarefa avancarEstado(@PathVariable int usuarioId, @PathVariable int tarefaId) {
+        return tarefaService.avancarEstado(usuarioId, tarefaId);
     }
 
-    @PutMapping("/{id}/atualizar")
-    public Tarefa atualizarTarefa(@PathVariable int id, @RequestParam String descricao) {
-        return tarefaService.atualizarTarefa(id, descricao);
+    @PutMapping("/{tarefaId}/atualizar")
+    public Tarefa atualizarTarefa(
+            @PathVariable int usuarioId,
+            @PathVariable int tarefaId,
+            @RequestParam String descricao) {
+        return tarefaService.atualizarTarefa(usuarioId, tarefaId, descricao);
     }
 
-    @DeleteMapping("/{id}/deletar")
-    public void deletarTarefa(@PathVariable int id) {
-        tarefaService.deletarTarefa(id);
+    @DeleteMapping("/{tarefaId}/deletar")
+    public void deletarTarefa(@PathVariable int usuarioId, @PathVariable int tarefaId) {
+        tarefaService.deletarTarefa(usuarioId, tarefaId);
     }
 
 }

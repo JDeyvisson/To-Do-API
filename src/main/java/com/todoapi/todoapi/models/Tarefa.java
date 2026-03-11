@@ -10,14 +10,15 @@ public class Tarefa {
     private int id;
     private String descricao;
     private TarefaState estado;
+    private int usuarioId; 
 
-    public Tarefa(String descricao) {
+    public Tarefa(String descricao, int usuarioId) {
         this.id = contadorId++;
         this.descricao = descricao;
         this.estado = new PendenteState(); 
+        this.usuarioId = usuarioId;
     }
 
-   
     public void avancarEstado() {
         this.estado = this.estado.avancar();
     }
@@ -36,6 +37,10 @@ public class Tarefa {
 
     public String getEstado() {
         return estado.getNome();
+    }
+
+    public int getUsuarioId() {
+        return usuarioId;
     }
 
 }
